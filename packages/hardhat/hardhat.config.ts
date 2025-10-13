@@ -37,7 +37,7 @@ const config: HardhatUserConfig = {
       },
     ],
   },
-  defaultNetwork: "localhost",
+  defaultNetwork: "potos_testnet",
   namedAccounts: {
     deployer: {
       // By default, it will take the first Hardhat account as the deployer
@@ -52,6 +52,12 @@ const config: HardhatUserConfig = {
         url: `https://eth-mainnet.alchemyapi.io/v2/${providerApiKey}`,
         enabled: process.env.MAINNET_FORKING_ENABLED === "true",
       },
+    },
+    potos_testnet: {
+      allowUnlimitedContractSize: true,
+      url: `https://rpc-testnet.potos.hk`,
+      chainId: 60600,
+      accounts: [deployerPrivateKey],
     },
     mainnet: {
       url: "https://mainnet.rpc.buidlguidl.com",
