@@ -1,0 +1,101 @@
+### 1. 部署ERC20Test合约
+POST http://localhost:8081/api/erc20test/deploy
+
+> {%
+    client.test("部署合约", function() {
+        client.assert(response.status === 200, "部署合约失败");
+        client.assert(response.body.contractAddress, "未返回合约地址");
+        client.global.set("contractAddress", response.body.contractAddress);
+        client.log("合约地址: " + response.body.contractAddress);
+    });
+%}
+
+### 2. 获取合约地址
+GET http://localhost:8081/api/erc20test/address
+
+### 3. 查询总供应量
+GET http://localhost:8081/api/erc20test/totalSupply
+
+> {%
+    client.test("查询总供应量", function() {
+        client.assert(response.status === 200, "查询总供应量失败");
+        client.log("总供应量: " + response.body.totalSupply);
+    });
+%}
+
+### 4. 查询部署者余额
+GET http://localhost:8081/api/erc20test/balance?account=0xd5aEc44813d3772c83794c970eB0a50215084cFa
+
+> {%
+    client.test("查询余额", function() {
+        client.assert(response.status === 200, "查询余额失败");
+        client.log("余额: " + response.body.balance);
+    });
+%}
+
+### 5. Mint代币
+POST http://localhost:8081/api/erc20test/mint?to=0xd5aEc44813d3772c83794c970eB0a50215084cFa&amount=1000000000000000000
+
+> {%
+    client.test("Mint代币", function() {
+        client.assert(response.status === 200, "Mint代币失败");
+        client.log("交易哈希: " + response.body.transactionHash);
+    });
+%}
+
+### 6. 再次查询余额确认Mint成功
+GET http://localhost:8081/api/erc20test/balance?account=0xd5aEc44813d3772c83794c970eB0a50215084cFa
+
+### 7. 转账到另一个地址
+POST http://localhost:8081/api/erc20test/transfer?to=0xE3219A5C3D650D2917a912FF0339dA5D42F7a6ec&amount=500000000000000000
+
+> {%
+    client.test("转账", function() {
+        client.assert(response.status === 200, "转账失败");
+        client.log("转账交易哈希: " + response.body.transactionHash);
+    });
+%}
+
+### 8. 授权其他地址使用代币
+//POST http://localhost:8081/api/erc20test/approve?spender=0xE3219A5C3D650D2917a912FF0339dA5D42F7a6ec&amount=300000000000000000
+POST http://localhost:8081/api/erc20test/approve?spender=0xd5aEc44813d3772c83794c970eB0a50215084cFa&amount=300000000000000000
+
+> {%
+    client.test("授权", function() {
+        client.assert(response.status === 200, "授权失败");
+        client.log("授权交易哈希: " + response.body.transactionHash);
+    });
+%}
+
+### 9. 查询授权额度
+//GET http://localhost:8081/api/erc20test/allowance?owner=0xd5aEc44813d3772c83794c970eB0a50215084cFa&spender=0xE3219A5C3D650D2917a912FF0339dA5D42F7a6ec
+GET http://localhost:8081/api/erc20test/allowance?owner=0xd5aEc44813d3772c83794c970eB0a50215084cFa&spender=0xd5aEc44813d3772c83794c970eB0a50215084cFa
+
+> {%
+    client.test("查询授权额度", function() {
+        client.assert(response.status === 200, "查询授权额度失败");
+        client.log("授权额度: " + response.body.allowance);
+    });
+%}
+
+### 10. 从授权账户转账 (transferFrom)
+//POST http://localhost:8081/api/erc20test/transferFrom?from=0xd5aEc44813d3772c83794c970eB0a50215084cFa&to=0xE3219A5C3D650D2917a912FF0339dA5D42F7a6ec&amount=100000000000000000
+POST http://localhost:8081/api/erc20test/transferFrom?from=0xd5aEc44813d3772c83794c970eB0a50215084cFa&to=0xd5aEc44813d3772c83794c970eB0a50215084cFa&amount=100000000000000000
+
+> {%
+    client.test("从授权账户转账", function() {
+        client.assert(response.status === 200, "transferFrom失败");
+        client.log("transferFrom交易哈希: " + response.body.transactionHash);
+    });
+%}
+
+### 11. 销毁代币
+POST http://localhost:8081/api/erc20test/burn?amount=100000000000000000
+
+> {%
+    client.test("销毁代币", function() {
+        client.assert(response.status === 200, "销毁代币失败");
+        client.log("销毁交易哈希: " + response.body.transactionHash);
+    });
+%}
+
